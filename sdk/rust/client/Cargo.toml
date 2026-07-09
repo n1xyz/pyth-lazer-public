@@ -6,6 +6,17 @@ description = "A Rust client for Pyth Lazer"
 license = "Apache-2.0"
 repository = "https://github.com/pyth-network/pyth-lazer-public"
 
+[features]
+default = ["rustls-tls"]
+native-tls = [
+  "reqwest/native-tls",
+  "tokio-tungstenite/native-tls",
+]
+rustls-tls = [
+  "reqwest/rustls-tls",
+  "tokio-tungstenite/rustls-tls-webpki-roots",
+]
+
 [dependencies]
 pyth-lazer-protocol = { workspace = true }
 pyth-lazer-publisher-sdk = { workspace = true }
@@ -23,13 +34,22 @@ futures = { workspace = true }
 futures-util = { workspace = true }
 humantime-serde = { workspace = true }
 protobuf-json-mapping = { workspace = true }
-reqwest = { workspace = true, features = ["json"] }
+reqwest = { version = "0.12.23", default-features = false, features = [
+  "charset",
+  "http2",
+  "json",
+  "multipart",
+  "system-proxy",
+] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_with = { workspace = true }
 tokio = { workspace = true }
 tokio-stream = { workspace = true }
-tokio-tungstenite = { workspace = true }
+tokio-tungstenite = { version = "0.26.2", default-features = false, features = [
+  "connect",
+  "url",
+] }
 tracing = { workspace = true }
 ttl_cache = { workspace = true }
 url = { workspace = true }

@@ -1,3 +1,9 @@
+#[cfg(all(feature = "native-tls", feature = "rustls-tls"))]
+compile_error!("features `native-tls` and `rustls-tls` are mutually exclusive");
+
+#[cfg(not(any(feature = "native-tls", feature = "rustls-tls")))]
+compile_error!("one of `native-tls` or `rustls-tls` must be enabled");
+
 const CHANNEL_CAPACITY: usize = 1000;
 
 pub mod api_client;
