@@ -5,7 +5,7 @@ set -euo pipefail
 #
 # Prerequisites:
 #   - stellar CLI v25+ (https://developers.stellar.org/docs/tools/cli/install-cli)
-#   - Rust >= 1.84 with the wasm32v1-none target: rustup target add wasm32v1-none
+#   - Rust >= 1.91 with the wasm32v1-none target: rustup target add wasm32v1-none
 #   - wasm-opt (optional, for WASM optimization): cargo install wasm-opt
 #
 # Usage:

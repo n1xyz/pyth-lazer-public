@@ -42,7 +42,7 @@ Soroban smart contracts for verifying [Pyth Lazer](https://docs.pyth.network/laz
 
 ## Prerequisites
 
-- [Rust](https://rustup.rs/) (>= 1.84)
+- [Rust](https://rustup.rs/) (>= 1.91)
 - Soroban target: `rustup target add wasm32v1-none`
 - [Stellar CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/install-cli) (for deployment)
 

@@ -1,6 +1,6 @@
 # pyth-lazer-stellar-sdk
 
-Rust SDK for consuming [Pyth Lazer](https://docs.pyth.network/lazer) price updates inside Soroban (Stellar) smart contracts. It lets a contract cross-contract call a deployed `pyth-lazer-stellar` verifier and decode the verified payload bytes into typed values. The crate is `#![no_std]` and builds for the `wasm32v1-none` target (Rust >= 1.84).
+Rust SDK for consuming [Pyth Lazer](https://docs.pyth.network/lazer) price updates inside Soroban (Stellar) smart contracts. It lets a contract cross-contract call a deployed `pyth-lazer-stellar` verifier and decode the verified payload bytes into typed values. The crate is `#![no_std]` and builds for the `wasm32v1-none` target (Rust >= 1.91).
 
 ## Install
 

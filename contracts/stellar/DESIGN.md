@@ -30,7 +30,7 @@ Pyth Lazer is a low-latency price oracle system that distributes signed price fe
 The Pyth Lazer protocol defines an `LeEcdsaMessage` envelope (used by Sui and Solana ECDSA paths):
 
 ```
-[4 bytes]  magic (LE u32) = 0x4D475044 (LE_ECDSA_FORMAT_MAGIC = 1296547300)
+[4 bytes]  magic (LE u32) = 0x4D47BDE4 (LE_ECDSA_FORMAT_MAGIC = 1296547300)
 [64 bytes] ECDSA signature (r: 32 bytes, s: 32 bytes)
 [1 byte]   recovery_id
 [2 bytes]  payload_length (LE u16)
@@ -42,7 +42,7 @@ The payload is signed with secp256k1 ECDSA over `keccak256(payload)`. The signer
 ### Payload Format
 
 ```
-[4 bytes]  payload_magic (LE u32) = 0x93DFF3F5 (PAYLOAD_MAGIC = 2479346549)
+[4 bytes]  payload_magic (LE u32) = 0x93C7D375 (PAYLOAD_MAGIC = 2479346549)
 [8 bytes]  timestamp (LE u64, microseconds since epoch)
 [1 byte]   channel (enum: 0=Invalid, 1=RealTime, 2=FixedRate50, etc.)
 [1 byte]   num_feeds
@@ -282,7 +282,7 @@ lazer/contracts/stellar/
 
 **1. LE-ECDSA format (not EVM format)**
 
-The Sui contract uses the LE-ECDSA format (`LeEcdsaMessage` with magic `0x4D475044`). We will use the same format for Stellar since:
+The Sui contract uses the LE-ECDSA format (`LeEcdsaMessage` with magic `0x4D47BDE4`). We will use the same format for Stellar since:
 - LE encoding is natural for WASM/Rust
 - The Sui contract is the closest reference implementation
 - keccak256 + secp256k1 are natively supported as Soroban host functions

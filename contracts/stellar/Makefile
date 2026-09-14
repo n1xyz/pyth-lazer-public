@@ -3,7 +3,7 @@
 WASM_DIR = $(CURDIR)/target/wasm32v1-none/release
 
 # Only contract crates: integration-tests pulls soroban-env-host and cannot compile for wasm32v1-none.
-# Requires `rustup target add wasm32v1-none` (Rust >= 1.84).
+# Requires `rustup target add wasm32v1-none` (Rust >= 1.91).
 build:
 	cd $(CURDIR) && cargo build --release --target wasm32v1-none \
 		-p pyth-lazer-stellar -p wormhole-executor-stellar -p pyth-lazer-stellar-sdk
