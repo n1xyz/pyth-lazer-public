@@ -2,7 +2,7 @@ use core::ops::Deref;
 
 use soroban_sdk::{vec, Address, Bytes, Env, IntoVal, Symbol};
 
-use crate::error::ParseError;
+use crate::error::VerifyError;
 use crate::payload::{parse_payload, Update};
 
 /// An [`Update`] that has been verified through the on-chain verifier contract.
@@ -11,6 +11,8 @@ use crate::payload::{parse_payload, Update};
 /// from a successful [`PythLazerClient::verify_update`] rather than from a raw
 /// [`parse_payload`] call on arbitrary bytes. Read fields directly via [`Deref`]
 /// or take ownership of the inner value with [`VerifiedPayload::into_inner`].
+///
+/// [`parse_payload`]: crate::parse_payload
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct VerifiedPayload(Update);
 
@@ -46,9 +48,12 @@ impl<'a> PythLazerClient<'a> {
     }
 
     /// Verify an LE-ECDSA signed Pyth Lazer update via the verifier contract and
-    /// parse the verified payload into a typed [`VerifiedPayload`]. Traps if the
-    /// update fails verification; returns [`ParseError`] if the verified payload
-    /// bytes are malformed.
+    /// parse the verified payload into a typed [`VerifiedPayload`].
+    ///
+    /// Returns [`VerifyError`] on any verifier-side failure (untrusted signer,
+    /// expired signer, malformed envelope) or payload parse failure. Traps in
+    /// the host (e.g. `secp256k1_recover` rejecting a non-canonical signature)
+    /// surface as [`VerifyError::InvokeFailed`].
     ///
     /// Verification is stateless and does not prevent replay of an update, so
     /// deduplicate and enforce freshness with
@@ -56,12 +61,19 @@ impl<'a> PythLazerClient<'a> {
     /// relevant, the per-feed
     /// [`feed_update_timestamp`](crate::payload::Feed::feed_update_timestamp)),
     /// never with the raw `data` bytes, the signature, or a hash of either.
-    pub fn verify_update(&self, data: &Bytes) -> Result<VerifiedPayload, ParseError> {
-        let verified: Bytes = self.env.invoke_contract(
+    pub fn verify_update(&self, data: &Bytes) -> Result<VerifiedPayload, VerifyError> {
+        let call = self.env.try_invoke_contract::<Bytes, VerifyError>(
             &self.address,
             &Symbol::new(self.env, "verify_update"),
             vec![self.env, data.into_val(self.env)],
         );
-        parse_payload(&verified).map(VerifiedPayload)
+        let verified = match call {
+            Ok(Ok(bytes)) => bytes,
+            Err(Ok(err)) => return Err(err),
+            Ok(Err(_)) | Err(Err(_)) => return Err(VerifyError::InvokeFailed),
+        };
+        parse_payload(&verified)
+            .map(VerifiedPayload)
+            .map_err(VerifyError::from)
     }
 }

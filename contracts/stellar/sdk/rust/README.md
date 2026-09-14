@@ -6,13 +6,13 @@ Rust SDK for consuming [Pyth Lazer](https://docs.pyth.network/lazer) price updat
 
 ```toml
 [dependencies]
-pyth-lazer-stellar-sdk = "0.3"
+pyth-lazer-stellar-sdk = "0.4"
 ```
 
 ## Usage
 
 ```rust
-use pyth_lazer_stellar_sdk::PythLazerClient;
+use pyth_lazer_stellar_sdk::{PythLazerClient, VerifyError};
 use soroban_sdk::{contract, contractimpl, Address, Bytes, Env};
 
 #[contract]
@@ -20,15 +20,15 @@ pub struct ExampleConsumer;
 
 #[contractimpl]
 impl ExampleConsumer {
-    pub fn update_price(env: Env, lazer: Address, update: Bytes) -> i64 {
+    pub fn update_price(env: Env, lazer: Address, update: Bytes) -> Result<i64, VerifyError> {
         let lazer = PythLazerClient::new(&env, &lazer);
-        let parsed = lazer.verify_update(&update).expect("invalid payload");
-        parsed
+        let parsed = lazer.verify_update(&update)?;
+        Ok(parsed
             .feeds
             .iter()
             .find(|f| f.feed_id == 1)
             .and_then(|f| f.price)
-            .unwrap_or(0)
+            .unwrap_or(0))
     }
 }
 ```
@@ -37,6 +37,11 @@ impl ExampleConsumer {
 `Update` that signals the bytes passed on-chain verification. Read fields
 directly (it derefs to `Update`) or call `.into_inner()` to take ownership of
 the `Update`.
+
+Verifier-side failures (untrusted signer, expired signer, malformed envelope)
+and payload parse failures both surface as `VerifyError`, which is a
+`#[contracterror]` so it can be propagated directly from the caller's contract
+entrypoint via `?`.
 
 > **⚠️ Security: `parse_payload` does not verify signatures.**
 >

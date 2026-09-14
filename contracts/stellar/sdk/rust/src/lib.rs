@@ -23,5 +23,5 @@ mod error;
 mod payload;
 
 pub use client::{PythLazerClient, VerifiedPayload};
-pub use error::ParseError;
+pub use error::{ParseError, VerifyError};
 pub use payload::{parse_payload, Channel, Feed, MarketSession, Update};
