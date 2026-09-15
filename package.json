@@ -89,6 +89,7 @@
     "d3-selection": "^3.0.0",
     "dayjs": "^1.11.23",
     "dotenv": "^17.4.2",
+    "driver.js": "^1.8.0",
     "flags": "^4.3.0",
     "fumadocs-core": "^16.15.1",
     "fumadocs-mdx": "^15.3.1",
