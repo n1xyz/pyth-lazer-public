@@ -94,7 +94,12 @@ function readLeU64(buf: Buffer, offset: number): bigint {
   return buf.readBigUInt64LE(offset);
 }
 
-type ParsedFeed = { id: number; price?: bigint };
+type ParsedFeed = {
+  id: number;
+  price?: bigint;
+  exponent?: number;
+  feedUpdateTimestamp?: bigint;
+};
 type ParsedPayload = { magic: number; channelId: number; feeds: ParsedFeed[] };
 
 /** Parse the verified payload, printing feed data and returning structured fields. */
@@ -182,6 +187,7 @@ function parsePayload(buf: Buffer): ParsedPayload {
           // Exponent (i16)
           const val = buf.readInt16LE(offset);
           offset += 2;
+          feed.exponent = val;
           console.log(`    [${propId}] Exponent: ${val}`);
           break;
         }
@@ -266,6 +272,7 @@ function parsePayload(buf: Buffer): ParsedPayload {
           if (exists) {
             const val = readLeU64(buf, offset);
             offset += 8;
+            feed.feedUpdateTimestamp = val;
             console.log(`    [${propId}] FeedUpdateTimestamp: ${val}`);
           } else {
             console.log(`    [${propId}] FeedUpdateTimestamp: (absent)`);
@@ -321,7 +328,11 @@ try {
     formats: ["leEcdsa"],
     jsonBinaryEncoding: "hex",
     priceFeedIds: [BTC_USD_FEED_ID],
-    properties: ["price"],
+    // A consumer contract reads price, exponent and feed_update_timestamp off the
+    // verified payload. A property that is not requested here decodes to `None`
+    // on-chain, so requesting all three keeps this payload usable by a consumer
+    // rather than only by the raw verifier.
+    properties: ["price", "exponent", "feedUpdateTimestamp"],
   });
 
   const hex = response.leEcdsa?.data;
@@ -399,9 +410,16 @@ assert.ok(
   parsed.feeds.some((feed) => feed.price !== undefined && feed.price !== 0n),
   "no feed reported a non-zero price",
 );
+const btcUsd = parsed.feeds.find((feed) => feed.id === BTC_USD_FEED_ID);
+assert.ok(btcUsd, `BTC/USD feed (id ${BTC_USD_FEED_ID}) not present`);
+// A consumer contract needs all three, so assert the payload actually carries them.
 assert.ok(
-  parsed.feeds.some((feed) => feed.id === BTC_USD_FEED_ID),
-  `BTC/USD feed (id ${BTC_USD_FEED_ID}) not present`,
+  btcUsd.exponent !== undefined,
+  "BTC/USD feed is missing the exponent property",
+);
+assert.ok(
+  btcUsd.feedUpdateTimestamp !== undefined,
+  "BTC/USD feed is missing the feedUpdateTimestamp property",
 );
 
 // --- Done ---
