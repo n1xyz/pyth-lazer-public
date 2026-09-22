@@ -362,7 +362,7 @@ features = ["axum"]
 version = "9.0.0"
 
 [workspace.dependencies.uuid]
-features = ["serde", "v4", "v7"]
+features = ["serde", "v4", "v5", "v7"]
 version = "1"
 
 [workspace.dependencies.winnow]
