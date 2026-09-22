@@ -23,6 +23,7 @@ mod serde_str;
 mod symbol_state;
 /// Lazer's types for time representation.
 pub mod time;
+mod nord;
 
 use {
     protobuf::MessageFull,
@@ -66,6 +67,12 @@ pub struct PublisherId(pub u16);
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, From, Into,
 )]
+#[cfg_attr(
+    feature = "borsh",
+    derive(borsh::BorshDeserialize, borsh::BorshSerialize)
+)]
+#[cfg_attr(feature = "borsh-schema", derive(borsh::BorshSchema))]
+#[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(feature = "utoipa", schema(value_type = u32))]
 pub struct PriceFeedId(pub u32);
 

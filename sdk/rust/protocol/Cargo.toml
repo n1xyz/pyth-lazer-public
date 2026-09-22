@@ -6,8 +6,14 @@ description = "Pyth Lazer SDK - protocol types."
 license = "Apache-2.0"
 repository = "https://github.com/pyth-network/pyth-lazer-public"
 
+[features]
+borsh = ["dep:borsh"]
+borsh-schema = ["borsh", "borsh/unstable__schema"]
+schemars = ["dep:schemars"]
+
 [dependencies]
 anyhow = { workspace = true }
+borsh = { workspace = true, features = ["derive"], optional = true }
 byteorder = { workspace = true }
 chrono = { workspace = true }
 # Use older version to keep compatibility with old Solana toolchains.
@@ -20,6 +26,7 @@ mry = { workspace = true, features = ["serde"], optional = true }
 protobuf = { workspace = true }
 protobuf-json-mapping = { workspace = true }
 rust_decimal = { workspace = true }
+schemars = { workspace = true, optional = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 serde_with = { workspace = true, features = ["hex"] }
